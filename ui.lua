@@ -27,7 +27,7 @@ local Config = {
     MainGuiName     = "anything", -- Name of the main script's GUI to check if it's already executing
 
     -- [7] Hub Information & UI Text
-    HubName         = "valiant, -- The main title shown at the top of the GUI
+    HubName         = "valiant", -- The main title shown at the top of the GUI
     HubDescription  = "https://discord.gg/Wbxf5tA38B" -- The text shown below the title
 }
 
@@ -240,7 +240,7 @@ local function CreateGUI()
     Corner.Parent = MainFrame
 
     local Scale = Instance.new("UIScale")
-    Scale.Scale = 0.88
+    Scale.Scale = 0.94
     Scale.Parent = MainFrame
 
     local Stroke = Instance.new("UIStroke")
@@ -576,12 +576,14 @@ local function CreateGUI()
 
     currentY += 55
 
-    local function MakeButton(name, text, position, width, color)
+    -- Buttons: fixed widths with a clear 12px gap between them
+    local function MakeButton(name, text, x, color)
         local button = New("TextButton", {
             Name = name,
-            Size = UDim2.new(width, -5, 0, 41),
-            Position = position,
+            Size = UDim2.fromOffset(147, 42),
+            Position = UDim2.fromOffset(x, currentY),
             BackgroundColor3 = color,
+            BackgroundTransparency = 0,
             Text = text,
             TextColor3 = WHITE,
             Font = Enum.Font.GothamBold,
@@ -591,18 +593,47 @@ local function CreateGUI()
             ZIndex = 4
         }, MainFrame)
 
-        Round(button, 8)
+        Round(button, 10)
+
+        local stroke = AddStroke(
+            button,
+            color == RED
+                and Color3.fromRGB(255, 95, 110)
+                or Color3.fromRGB(65, 65, 76),
+            1,
+            0.25
+        )
 
         button.MouseEnter:Connect(function()
-            TweenService:Create(button, TweenInfo.new(0.15), {
-                BackgroundColor3 = color:Lerp(Color3.new(1, 1, 1), 0.08)
-            }):Play()
+            TweenService:Create(
+                button,
+                TweenInfo.new(0.18, Enum.EasingStyle.Quad),
+                {
+                    BackgroundColor3 = color:Lerp(
+                        Color3.new(1, 1, 1), 0.1
+                    )
+                }
+            ):Play()
+
+            TweenService:Create(
+                stroke,
+                TweenInfo.new(0.18),
+                {Transparency = 0}
+            ):Play()
         end)
 
         button.MouseLeave:Connect(function()
-            TweenService:Create(button, TweenInfo.new(0.15), {
-                BackgroundColor3 = color
-            }):Play()
+            TweenService:Create(
+                button,
+                TweenInfo.new(0.18, Enum.EasingStyle.Quad),
+                {BackgroundColor3 = color}
+            ):Play()
+
+            TweenService:Create(
+                stroke,
+                TweenInfo.new(0.18),
+                {Transparency = 0.25}
+            ):Play()
         end)
 
         return button
@@ -611,20 +642,18 @@ local function CreateGUI()
     local VerifyBtn = MakeButton(
         "VerifyButton",
         "VERIFY KEY",
-        UDim2.fromOffset(22, currentY),
-        0.5,
+        22,
         RED
     )
 
     local GetKeyBtn = MakeButton(
         "GetKeyButton",
-        "GET KEY ↗",
-        UDim2.new(0.5, 0, 0, currentY),
-        0.5,
-        Color3.fromRGB(37, 37, 44)
+        "GET KEY  ↗",
+        181,
+        Color3.fromRGB(32, 32, 40)
     )
 
-    currentY += 49
+    currentY += 52
 
     local Status = Label(
         "StatusLabel",
@@ -830,32 +859,43 @@ local function CreateGUI()
         end
     end
 
-    -- Open animation: scale + fade
+    -- Open animation: subtle, smooth scale-up (94% -> 100%) + fade
+    -- Uses Quad easing to avoid the large bounce/overshoot effect.
     TweenService:Create(
         Overlay,
-        TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {BackgroundTransparency = 0.4}
     ):Play()
 
     TweenService:Create(
         MainFrame,
-        TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        TweenInfo.new(0.42, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {BackgroundTransparency = 0}
     ):Play()
 
     TweenService:Create(
         Scale,
-        TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        TweenInfo.new(0.42, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {Scale = 1}
     ):Play()
 
-    task.delay(0.32, function()
+    task.delay(0.42, function()
         if Overlay and Overlay.Parent then
             TweenService:Create(
                 Overlay,
-                TweenInfo.new(0.2),
+                TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
                 {BackgroundTransparency = 1}
             ):Play()
         end
     end)
 end
+
+local player = game:GetService("Players").LocalPlayer
+local pGui = player:WaitForChild("PlayerGui")
+
+if pGui:FindFirstChild(Config.MainGuiName) then
+    StartMainScript() 
+    return
+end
+
+CreateGUI()
