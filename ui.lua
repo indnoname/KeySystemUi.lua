@@ -4,7 +4,7 @@ local Config = {
     PlatoSecret     = "9b7a24a7-cbe2-4e1f-836d-07083333ec81", -- Your PlatoBoost Secret Key
 
     -- [2] Anti-Bypass / Global Secret Variable
-    Secret          = "valiant.api.it", -- This makes the script ONLY run from the key script. Even if they copy the original obfuscated script to bypass the key, they won't be able to!
+    Secret          = "320fda38a1b4447b8bcc142e2c1570abac67e8f474f", -- This makes the script ONLY run from the key script. Even if they copy the original obfuscated script to bypass the key, they won't be able to!
     
     -- [3] Scripts & Links
     MainScriptURL   = "https://raw.githubusercontent.com/indnoname/aimbot/refs/heads/main/keyapi", -- The raw URL of your main script
