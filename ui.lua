@@ -163,15 +163,15 @@ local function CreateGUI()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
 
-    -- VALIANT THEME (ไม่แก้ Config)
-    local RED = Color3.fromRGB(235, 45, 65)
-    local RED_DARK = Color3.fromRGB(115, 20, 32)
-    local BG = Color3.fromRGB(10, 10, 12)
-    local PANEL = Color3.fromRGB(18, 18, 22)
-    local INPUT_BG = Color3.fromRGB(25, 25, 30)
-    local WHITE = Color3.fromRGB(245, 245, 248)
-    local MUTED = Color3.fromRGB(145, 145, 155)
-    local GREEN = Color3.fromRGB(65, 220, 125)
+    -- VALIANT / GRAPHITE INTERFACE
+    local RED = Color3.fromRGB(218, 60, 76)
+    local RED_DARK = Color3.fromRGB(105, 31, 42)
+    local BG = Color3.fromRGB(15, 15, 18)
+    local PANEL = Color3.fromRGB(24, 24, 29)
+    local INPUT_BG = Color3.fromRGB(20, 20, 24)
+    local WHITE = Color3.fromRGB(235, 233, 235)
+    local MUTED = Color3.fromRGB(151, 148, 154)
+    local GREEN = Color3.fromRGB(105, 198, 142)
 
     local old = playerGui:FindFirstChild("OYB_KeySystem")
     if old then old:Destroy() end
@@ -202,7 +202,7 @@ local function CreateGUI()
     if Config.ShowInstagram then socialCount += 1 end
     if Config.ShowYoutube then socialCount += 1 end
 
-    local WIDTH = 350
+    local WIDTH = 356
     local HEIGHT = 380 + socialCount * 43
 
     local ScreenGui = Instance.new("ScreenGui")
@@ -235,8 +235,23 @@ local function CreateGUI()
     MainFrame.ZIndex = 2
     MainFrame.Parent = ScreenGui
 
+    local Shadow = Instance.new("Frame")
+    Shadow.Name = "SoftShadow"
+    Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+    Shadow.Position = UDim2.new(0.5, 0, 0.5, 5)
+    Shadow.Size = UDim2.fromOffset(WIDTH + 8, HEIGHT + 8)
+    Shadow.BackgroundColor3 = Color3.new(0, 0, 0)
+    Shadow.BackgroundTransparency = 0.62
+    Shadow.BorderSizePixel = 0
+    Shadow.ZIndex = 1
+    Shadow.Parent = ScreenGui
+
+    local ShadowCorner = Instance.new("UICorner")
+    ShadowCorner.CornerRadius = UDim.new(0, 15)
+    ShadowCorner.Parent = Shadow
+
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 15)
+    Corner.CornerRadius = UDim.new(0, 12)
     Corner.Parent = MainFrame
 
     local Scale = Instance.new("UIScale")
@@ -245,8 +260,8 @@ local function CreateGUI()
 
     local Stroke = Instance.new("UIStroke")
     Stroke.Color = RED_DARK
-    Stroke.Thickness = 1.4
-    Stroke.Transparency = 0.1
+    Stroke.Thickness = 1
+    Stroke.Transparency = 0.22
     Stroke.Parent = MainFrame
 
     local function New(className, properties, parent)
@@ -262,7 +277,7 @@ local function CreateGUI()
 
     local function Round(object, radius)
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, radius or 8)
+        corner.CornerRadius = UDim.new(0, radius or 7)
         corner.Parent = object
         return corner
     end
@@ -306,8 +321,8 @@ local function CreateGUI()
     -- Brand mark
     local Logo = New("Frame", {
         Name = "Logo",
-        Size = UDim2.fromOffset(42, 42),
-        Position = UDim2.fromOffset(22, 23),
+        Size = UDim2.fromOffset(40, 40),
+        Position = UDim2.fromOffset(20, 22),
         BackgroundColor3 = Color3.fromRGB(40, 13, 19),
         BorderSizePixel = 0,
         ZIndex = 4
@@ -320,7 +335,7 @@ local function CreateGUI()
         Name = "LogoText",
         Size = UDim2.fromScale(1, 1),
         BackgroundTransparency = 1,
-        Text = "V",
+        Text = "v",
         TextColor3 = RED,
         Font = Enum.Font.GothamBlack,
         TextSize = 27,
@@ -339,7 +354,7 @@ local function CreateGUI()
 
     Label(
         "BrandSubtitle",
-        "KEY AUTHENTICATION SYSTEM",
+        "PRIVATE ACCESS  /  CLIENT PORTAL",
         UDim2.new(1, -125, 0, 18),
         UDim2.fromOffset(77, 51),
         9,
@@ -350,7 +365,7 @@ local function CreateGUI()
     local CloseBtn = New("TextButton", {
         Name = "CloseButton",
         Size = UDim2.fromOffset(31, 31),
-        Position = UDim2.new(1, -44, 0, 24),
+        Position = UDim2.new(1, -42, 0, 22),
         BackgroundColor3 = PANEL,
         Text = "×",
         TextColor3 = MUTED,
@@ -377,9 +392,38 @@ local function CreateGUI()
         }):Play()
     end)
 
-    CloseBtn.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
+    local closing = false
+    local function CloseGUI()
+        if closing then return end
+        closing = true
+        CloseBtn.Active = false
+
+        TweenService:Create(
+            Overlay,
+            TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 1}
+        ):Play()
+
+        TweenService:Create(
+            MainFrame,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            {BackgroundTransparency = 1}
+        ):Play()
+
+        TweenService:Create(
+            Scale,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            {Scale = 0.96}
+        ):Play()
+
+        task.delay(0.22, function()
+            if ScreenGui and ScreenGui.Parent then
+                ScreenGui:Destroy()
+            end
+        end)
+    end
+
+    CloseBtn.MouseButton1Click:Connect(CloseGUI)
 
     -- Description
     Label(
@@ -396,7 +440,7 @@ local function CreateGUI()
         Name = "HeaderDivider",
         Size = UDim2.new(1, -44, 0, 1),
         Position = UDim2.fromOffset(22, 116),
-        BackgroundColor3 = Color3.fromRGB(42, 42, 48),
+        BackgroundColor3 = Color3.fromRGB(45, 43, 48),
         BorderSizePixel = 0,
         ZIndex = 3
     }, MainFrame)
@@ -417,7 +461,7 @@ local function CreateGUI()
         }, MainFrame)
 
         Round(button, 8)
-        AddStroke(button, Color3.fromRGB(48, 48, 55), 1, 0.2)
+        AddStroke(button, Color3.fromRGB(48, 46, 51), 1, 0.2)
 
         New("Frame", {
             Name = "ColorAccent",
@@ -455,7 +499,7 @@ local function CreateGUI()
 
         button.MouseEnter:Connect(function()
             TweenService:Create(button, TweenInfo.new(0.15), {
-                BackgroundColor3 = Color3.fromRGB(32, 24, 28)
+                BackgroundColor3 = Color3.fromRGB(37, 27, 31)
             }):Play()
         end)
 
@@ -480,7 +524,7 @@ local function CreateGUI()
     if Config.ShowDiscord then
         AddSocialButton(
             "DiscordButton",
-            "JOIN DISCORD",
+            "DISCORD COMMUNITY",
             Config.DiscordURL,
             Color3.fromRGB(115, 135, 255)
         )
@@ -489,7 +533,7 @@ local function CreateGUI()
     if Config.ShowInstagram then
         AddSocialButton(
             "InstagramButton",
-            "FOLLOW INSTAGRAM",
+            "INSTAGRAM",
             Config.InstagramURL,
             Color3.fromRGB(240, 85, 135)
         )
@@ -498,7 +542,7 @@ local function CreateGUI()
     if Config.ShowYoutube then
         AddSocialButton(
             "YoutubeButton",
-            "SUBSCRIBE YOUTUBE",
+            "YOUTUBE CHANNEL",
             Config.YoutubeURL,
             RED
         )
@@ -509,7 +553,7 @@ local function CreateGUI()
             Name = "SocialDivider",
             Size = UDim2.new(1, -44, 0, 1),
             Position = UDim2.fromOffset(22, currentY + 1),
-            BackgroundColor3 = Color3.fromRGB(42, 42, 48),
+            BackgroundColor3 = Color3.fromRGB(45, 43, 48),
             BorderSizePixel = 0,
             ZIndex = 3
         }, MainFrame)
@@ -519,7 +563,7 @@ local function CreateGUI()
 
     Label(
         "KeyLabel",
-        "ACCESS KEY",
+        "YOUR ACCESS KEY",
         UDim2.new(1, -44, 0, 19),
         UDim2.fromOffset(22, currentY),
         10,
@@ -535,8 +579,8 @@ local function CreateGUI()
         Position = UDim2.fromOffset(22, currentY),
         BackgroundColor3 = INPUT_BG,
         Text = "",
-        PlaceholderText = "Enter your access key...",
-        PlaceholderColor3 = Color3.fromRGB(105, 105, 115),
+        PlaceholderText = "Paste your key here",
+        PlaceholderColor3 = Color3.fromRGB(112, 108, 116),
         TextColor3 = WHITE,
         Font = Enum.Font.Code,
         TextSize = 13,
@@ -549,7 +593,7 @@ local function CreateGUI()
     Round(KeyInput, 8)
     local InputStroke = AddStroke(
         KeyInput,
-        Color3.fromRGB(52, 52, 60),
+        Color3.fromRGB(53, 50, 56),
         1,
         0
     )
@@ -569,7 +613,7 @@ local function CreateGUI()
 
     KeyInput.FocusLost:Connect(function()
         TweenService:Create(InputStroke, TweenInfo.new(0.15), {
-            Color = Color3.fromRGB(52, 52, 60),
+            Color = Color3.fromRGB(53, 50, 56),
             Transparency = 0
         }):Play()
     end)
@@ -648,16 +692,16 @@ local function CreateGUI()
 
     local GetKeyBtn = MakeButton(
         "GetKeyButton",
-        "GET KEY  ↗",
+        "GET ACCESS LINK  ↗",
         181,
-        Color3.fromRGB(32, 32, 40)
+        Color3.fromRGB(34, 33, 38)
     )
 
     currentY += 52
 
     local Status = Label(
         "StatusLabel",
-        "●  READY TO AUTHENTICATE",
+        "●  READY  —  WAITING FOR KEY",
         UDim2.new(1, -44, 0, 22),
         UDim2.fromOffset(22, currentY),
         10,
@@ -674,24 +718,25 @@ local function CreateGUI()
         Name = "FooterDivider",
         Size = UDim2.new(1, -44, 0, 1),
         Position = UDim2.fromOffset(22, currentY),
-        BackgroundColor3 = Color3.fromRGB(38, 38, 44),
+        BackgroundColor3 = Color3.fromRGB(45, 43, 48),
         BorderSizePixel = 0,
         ZIndex = 3
     }, MainFrame)
 
     Label(
         "Footer",
-        "VALIANT  /  SECURE ACCESS",
+        "VALIANT     •     ACCESS PORTAL",
         UDim2.new(1, -44, 0, 22),
         UDim2.fromOffset(22, currentY + 5),
         9,
-        Color3.fromRGB(90, 90, 100),
+        Color3.fromRGB(115, 111, 119),
         Enum.Font.GothamBold
     )
 
     -- Dynamic height
     HEIGHT = currentY + 36
     MainFrame.Size = UDim2.fromOffset(WIDTH, HEIGHT)
+    Shadow.Size = UDim2.fromOffset(WIDTH + 8, HEIGHT + 8)
 
     -- Drag support
     local dragging = false
@@ -772,8 +817,8 @@ local function CreateGUI()
                 task.wait(0.5)
 
                 if ScreenGui.Parent then
-                    ScreenGui:Destroy()
-                    StartMainScript()
+                    CloseGUI()
+                    task.delay(0.23, StartMainScript)
                 end
             else
                 Status.Text = "●  " .. tostring(msg)
@@ -814,7 +859,7 @@ local function CreateGUI()
                 Status.TextColor3 = RED
             end
 
-            GetKeyBtn.Text = "GET KEY ↗"
+            GetKeyBtn.Text = "GET ACCESS LINK  ↗"
             busy = false
         end)
     end)
@@ -847,8 +892,8 @@ local function CreateGUI()
                     task.wait(0.5)
 
                     if ScreenGui.Parent then
-                        ScreenGui:Destroy()
-                        StartMainScript()
+                        CloseGUI()
+                        task.delay(0.23, StartMainScript)
                     end
                 else
                     Status.Text = "●  SAVED KEY INVALID"
@@ -869,13 +914,13 @@ local function CreateGUI()
 
     TweenService:Create(
         MainFrame,
-        TweenInfo.new(0.42, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        TweenInfo.new(0.38, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundTransparency = 0}
     ):Play()
 
     TweenService:Create(
         Scale,
-        TweenInfo.new(0.42, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        TweenInfo.new(0.38, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {Scale = 1}
     ):Play()
 
